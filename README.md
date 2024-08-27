@@ -1,6 +1,6 @@
 # ![image](https://github.com/user-attachments/assets/c8e698d0-d2e4-4c6c-a0ea-885d90addfb6)
 
-Procedimiento seguido para configurar el DNS.				
+<span style="color: red;">Este texto es rojo.</span> Procedimiento seguido para configurar el DNS.				
 ## ##
 Paso 1: actualizar:
 Para instalar el servidor DNS Bind en CentOS 9 usaremos los paquetes de la distribución, así que como primer paso actualizaremos la información de los repositorios.
