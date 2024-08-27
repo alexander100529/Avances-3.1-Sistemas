@@ -2,19 +2,20 @@
 
 Procedimiento seguido para configurar el DNS.</span>				
 ## ##
-Paso 1: actualizar
+**Paso 1: Actualizar**
 
 Para instalar el servidor DNS Bind en CentOS 9 usaremos los paquetes de la distribución, así que como primer paso actualizaremos la información de los repositorios.
 
 sudo dnf update
 ## ##
-Paso 2: instalar paquetes
+**Paso 2: Instalar paquetes**
 
 El paquete que necesitamos es bind, aunque también añadiremos el paquete bind-utils para poder usar algunas herramientas interesantes.
 
 sudo dnf install bind bind-utils
 ## ##
-Paso 3: habilitar e iniciar el servicio
+
+**Paso 3: habilitar e iniciar el servicio**
 
 Tras la descarga e instalación de estos paquetes, para que el servicio DNS named arranque con cada inicio de CentOS 9 tendremos que habilitarlo con systemctl.
 
@@ -22,7 +23,7 @@ sudo systemctl enable named
 
 ## ##
 
-Paso 4: configurar el firewall
+**Paso 4: configurar el firewall**
 
 En CentOS 9 el firewall suele estar activado por defecto, así que es necesario añadir una regla que permita el acceso al servicio DNS desde la red local y posteriormente se recarga el firewall.
 
@@ -32,7 +33,7 @@ sudo firewall-cmd --reload
 
 ## ##
 
-Paso 5: configurar el servidor dns
+**Paso 5: configurar el servidor dns**
 
 Para configurar el servicio DNS Bind en CentOS 9 debemos saber que el archivo principal es /etc/named.conf.
 
@@ -72,7 +73,7 @@ allow-query { any; };
 
 ## ##
 
-Paso 6: Comprobación de errores
+**Paso 6: Comprobación de errores**
 
 Guardamos los cambios y antes de iniciar Bind con la nueva configuración comprobamos que no haya errores en la configuración con el comando named-checkconf:
 
@@ -83,13 +84,13 @@ sudo systemctl start named
 
 ## ##
 
-Paso 7: Verificar el estado del servicio
+**Paso 7: Verificar el estado del servicio**
 
 sudo systemctl status named
 
 ## ##
 
-Paso 8: probar el servicio
+**Paso 8: probar el servicio**
 
 se usa para consultar información sobre nombres de dominio y registros DNS. En CentOS 9, el comando dig te permite realizar consultas DNS desde la línea de comandos.
 
