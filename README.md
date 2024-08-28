@@ -96,3 +96,50 @@ se usa para consultar información sobre nombres de dominio y registros DNS. En 
 
 dig @localhost example.com
 ## ##
+**Paso 9:**
+
+sudo nano /etc/bind/named.conf.local
+zone "example.local" {
+    type master;
+    file "/etc/bind/zones/db.example.local";
+};
+
+## ##
+
+**Paso 10:**
+
+sudo mkdir -p /etc/bind/zones
+sudo nano /etc/bind/zones/db.example.local
+$TTL    604800
+@       IN      SOA     ns1.example.local. admin.example.local. (
+                           1         ; Serial
+                      604800         ; Refresh
+                       86400         ; Retry
+                     2419200         ; Expire
+                      604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns1.example.local.
+@       IN      A       192.168.100.101
+ns1     IN      A       192.168.100.101
+asterisk IN      A       192.168.100.101
+
+## ##
+
+**Paso 11:**
+
+sudo named-checkconf
+sudo named-checkzone example.local /etc/bind/zones/db.example.local
+
+## ##
+
+**Paso 12:**
+
+sudo systemctl restart named
+
+## ##
+
+**Paso 13:** 
+
+dig asterisk.example.local
+
+## ##
