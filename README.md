@@ -6,7 +6,11 @@ Procedimiento seguido para configurar el DNS.</span>
 
 Para instalar el servidor DNS Bind en CentOS 9 usaremos los paquetes de la distribución, así que como primer paso actualizaremos la información de los repositorios.
 
-sudo dnf update
+'sudo dnf update'
+
+**Output:**
+
+
 ## ##
 **Paso 2: Instalar paquetes**
 
