@@ -7,7 +7,7 @@
 
 Para instalar el servidor DNS Bind en CentOS 9 usaremos los paquetes de la distribución, así que como primer paso actualizaremos la información de los repositorios.
 
-`sudo dnf update`
+`sudo dnf update -y`
 
 **Output:**
 
@@ -17,10 +17,69 @@ Para instalar el servidor DNS Bind en CentOS 9 usaremos los paquetes de la distr
 
 El paquete que necesitamos es bind, aunque también añadiremos el paquete bind-utils para poder usar algunas herramientas interesantes.
 
-sudo dnf install bind bind-utils
+`sudo dnf install bind bind-utils`
+
+## ##
+**Paso 3: Configuración del archivo named.conf**
+
+Primero, navegue hasta el directorio /etc de la siguiente manera:
+
+`cd /etc`
+
+Copiamos el archivo named.conf para tener un respaldo en caso de cometer algún error."
+
+`cp named.conf named.conf.original`
+
+Editamos el archivo named.conf, que es el archivo principal de configuración de BIND. Este archivo define cómo se comporta el servidor DNS y especifica las zonas que el servidor gestionará, utilizando el siguiente comando:
+
+`nano named.conf` 
+
+1.  Se ha editado la línea `listen-on port 53` para que el servidor escuche solicitudes DNS en la IP `192.168.1.9`, que es el servidor, a través del puerto 53.
+
+2. Se agregaron las siguientes líneas para configurar el reenvío de consultas DNS:
+  ```
+  forward first;
+  forwarders { 8.8.8.8; };
+  ```
+   Estas líneas indican que el servidor intentará resolver las solicitudes localmente primero (forward first;). Si no puede, reenviará las solicitudes al servidor DNS especificado en forwarders, que en este caso 
+   es 8.8.8.8, el servidor DNS de Google. De esta forma también podríamos tener acceso a internet.
+
+3. Se modificó la línea allow-query y la ponemos como `any` para que el servidor DNS acepte consultas desde cualquier dirección IP.
+
+![image](https://github.com/user-attachments/assets/cf9860a7-9080-49c1-869f-ac64409254b2)
+
+Al fianl del archivo colocaremos las zonas que son explica esto todo corto 
+
+
+![image](https://github.com/user-attachments/assets/4d9fc6f8-0e1e-495d-80a3-0681b3d35417)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ##
 
-**Paso 3: habilitar e iniciar el servicio**
+**Paso 3: habilitar e iniciar el servicio**  talves 
 
 Tras la descarga e instalación de estos paquetes, para que el servicio DNS named arranque con cada inicio de CentOS 9 tendremos que habilitarlo con systemctl.
 
@@ -38,31 +97,6 @@ sudo firewall-cmd --reload
 
 ## ##
 
-**Paso 5: configurar el servidor dns**
-
-Para configurar el servicio DNS Bind en CentOS 9 debemos saber que el archivo principal es /etc/named.conf.
-
-nano /etc/named.conf
-
-Para ello buscaremos las directivas listen-on y listen-on-v6:
-
-...
-
-listen-on port 53 { 127.0.0.1; };
-
-listen-on-v6 port 53 { ::1; };
-
-...
-
-Y las desactivaremos:
-
-...
-
-#listen-on port 53 { 127.0.0.1; };
-
-#listen-on-v6 port 53 { ::1; };
-
-Aunque ya podría recibir peticiones desde red, el servicio sólo responde a peticiones locales debido a la configuración de la directiva allow-query:
 
 ...
 
