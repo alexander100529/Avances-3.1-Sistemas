@@ -137,6 +137,7 @@ Para comprobar el cambio de grupo colomamos el comando:
 ## ##
 
 **Paso 7: Verificar resolv.conf**
+
 Se abre el archivo con el siguiente comando:
 
 `nano /etc/resolv.conf`
