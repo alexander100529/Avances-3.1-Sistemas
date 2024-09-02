@@ -26,7 +26,7 @@ Primero, navegue hasta el directorio /etc de la siguiente manera:
 
 `cd /etc`
 
-Copiamos el archivo named.conf para tener un respaldo en caso de cometer algún error."
+Copiamos el archivo named.conf para tener un respaldo en caso de cometer algún error.
 
 `cp named.conf named.conf.original`
 
@@ -194,6 +194,7 @@ sudo systemctl status named
 Con esto podemos comprobar que el servicio está funcionando correctamente.
 
 **Paso 11: Verificaciones del servicio DNS**
+
 Por último, se probó el servicio DNS con el comando nslookup. Primero, se realizó una consulta usando la IP del servidor para verificar si se resuelven correctamente los nombres de dominio asociados a esa IP. Luego, se realizó una consulta usando un nombre de dominio para comprobar si el servidor devuelve la IP correcta. 
 
 ![image](https://github.com/user-attachments/assets/c697a430-2a3f-4764-b920-41e5bcb623c8)
