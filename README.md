@@ -9,9 +9,6 @@ Para instalar el servidor DNS Bind en CentOS 9 usaremos los paquetes de la distr
 
 `sudo dnf update -y`
 
-**Output:**
-
-
 ## ##
 **Paso 2: Instalar paquetes**
 
