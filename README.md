@@ -34,7 +34,7 @@ Editamos el archivo named.conf, que es el archivo principal de configuración de
 
 `nano named.conf` 
 
-1.  Se ha editado la línea `listen-on port 53` para que el servidor escuche solicitudes DNS en la IP `192.168.1.9`, que es el servidor, a través del puerto 53.
+1.  Se ha editado la línea listen-on port 53 para que el servidor escuche solicitudes DNS en la IP `192.168.1.9`, que es el servidor, a través del puerto 53.
 
 2. Se agregaron las siguientes líneas para configurar el reenvío de consultas DNS:
   ```
@@ -48,137 +48,161 @@ Editamos el archivo named.conf, que es el archivo principal de configuración de
 
 ![image](https://github.com/user-attachments/assets/cf9860a7-9080-49c1-869f-ac64409254b2)
 
-Al fianl del archivo colocaremos las zonas que son explica esto todo corto 
+Al final del archivo de configuración, se definen las zonas para resolver nombres de dominio y direcciones IP:
 
+Zona directa (laboratorio.local): Resuelve nombres de dominio a direcciones IP.
+```
+zone "laboratorio.local" IN {
+    type master;
+    file "directa.laboratorio.local";
+};
+```
+Zona inversa (1.168.192.in-addr.arpa): Resuelve direcciones IP a nombres de dominio.
 
+```
+zone "1.168.192.in-addr.arpa" IN {
+    type master;
+    file "inversa.laboratorio.local";
+};
+```
 ![image](https://github.com/user-attachments/assets/4d9fc6f8-0e1e-495d-80a3-0681b3d35417)
 
+Por último guardamos los cambios y verificamos la configuración con el siguiente comando:
 
+`named-checkconf /etc/named.conf`
 
+![image](https://github.com/user-attachments/assets/80813b0d-e88f-4a27-ad11-fd2bd23b01f6)
 
+Si este comando no produce ninguna salida, la sintaxis de la configuración es correcta.
 
+## 
+**Paso 4: Configuración de la zona directa**
 
+Nos dirigimos al directorio `named` con el siguiente comando:
 
+`cd /var/named`
 
+Creamos el archivo para la zona directa con el comando:
 
+`nano directa.laboratorio.local`
 
+Luego, agregamos los siguientes datos al archivo:
 
+![image](https://github.com/user-attachments/assets/fd9c6615-7c11-4be4-9746-153b2f5ada28)
 
+Dicho archivo configura los registros DNS para el dominio laboratorio.local. Establece que el servidor DNS principal es srvcentos.laboratorio.local con la IP 192.168.1.9. Además, define alias para www, web, y ftp, todos apuntando a srvcentos.laboratorio.local.
 
+Guardamos los cambios y comprobamos la sintaxis del archivo de zona con el comando named-checkzone, indicando la ip del servidor y el nombre del archivo:
 
+`named-checkzone 192.168.1.9 directa.laboratorio.local`
 
-
-
-
-
-
-
-
-
+![Captura de pantalla 2024-09-01 175715](https://github.com/user-attachments/assets/23d25c6c-7971-474b-98d6-1261e3848408)
 
 
 ## ##
 
-**Paso 3: habilitar e iniciar el servicio**  talves 
+**Paso 5: Configuración de la zona inversa**
 
-Tras la descarga e instalación de estos paquetes, para que el servicio DNS named arranque con cada inicio de CentOS 9 tendremos que habilitarlo con systemctl.
+Creamos el archivo para la zona inversa con el comando:
 
+`nano inversa.laboratorio.local`
+
+Luego, agregamos los siguientes datos al archivo:
+
+![Captura de pantalla 2024-09-01 175246](https://github.com/user-attachments/assets/78aeeaff-4f0b-4b9d-9748-661232935a23)
+
+Este archivo configura la zona inversa DNS para el dominio laboratorio.local. Establece que srvcentos.laboratorio.local es el servidor de nombres y define registros PTR para resolver direcciones IP a nombres de dominio, incluyendo www, web, ftp, y el dominio principal laboratorio.local, todos apuntando a srvcentos.laboratorio.local.
+
+Guardamos los cambios y comprobamos la sintaxis del archivo de zona con el comando named-checkzone, indicando la ip del servidor y el nombre del archivo:
+
+![image](https://github.com/user-attachments/assets/7ddc9943-09e8-46eb-8e27-f762d5dbe23e)
+
+## ##
+
+**Paso 6: Cambio de grupo de las zonas**
+
+En el mismo directorio /var/named, cambiamos el grupo de los archivos que creamos para asegurar que el servidor DNS (BIND) pueda acceder a ellos correctamente. Utilizamos los siguientes comandos:
+ 
+```
+chgrp named directa.laboratorio.local 
+chgrp named inversa.laboratorio.local
+```
+Para comprobar el cambio de grupo colomamos el comando: 
+
+`ls -l`
+
+![image](https://github.com/user-attachments/assets/e728c9e4-42b7-48ac-bbd5-fc3d4fc4bf04)
+
+
+## ##
+
+**Paso 7: Verificar resolv.conf**
+Se abre el archivo con el siguiente comando:
+
+`nano /etc/resolv.conf`
+
+![image](https://github.com/user-attachments/assets/b16794da-0061-45b3-8994-aa07c6dfd397)
+
+Se verifica que la línea nameserver tenga la IP del servidor DNS. Este archivo debe apuntar a la IP del servidor DNS para que las solicitudes de resolución de nombres se dirijan correctamente al servidor DNS configurado.
+
+## ##
+
+**Paso 8: Actualizar el archivo hosts**
+
+Se abre el archivo con el siguiente comando:
+
+`nano /etc/hosts`
+
+Se añade una línea con la IP del servidor y el dominio.
+
+![image](https://github.com/user-attachments/assets/90886761-5c4b-45a6-a5d0-4c309506e91c)
+
+Esto permite que el sistema resuelva el dominio a la IP localmente, lo que es útil para pruebas y configuraciones internas.
+
+
+## ##
+
+**Paso 9: Configurar el firewall para el servicio DNS**
+
+En CentOS 9 el firewall suele estar activado por defecto, así que es necesario añadir una regla que permita el acceso al servicio DNS desde la red local:
+
+`sudo firewall-cmd --permanent --zone=public --add-service=dns`
+
+Aplicamos los cambios recargando la configuración del firewall:
+
+`sudo firewall-cmd --reload`
+
+Para verificar que el servicio DNS se ha añadido correctamente al firewall, se coloca el siguiente comando:
+
+`firewall-cmd --list-all`
+
+![image](https://github.com/user-attachments/assets/5abc0712-c1c7-4025-898c-6e76fe7fdf32)
+
+**Paso 10: Activación y Verificación del Servicio DNS**
+
+Una vez completados todos los pasos anteriores, habilite el servicio named (para que se inicie automáticamente al arrancar el sistema), inicie el servicio y verifique el estado utilizando los siguientes comandos:
+
+```
 sudo systemctl enable named
-
-## ##
-
-**Paso 4: configurar el firewall**
-
-En CentOS 9 el firewall suele estar activado por defecto, así que es necesario añadir una regla que permita el acceso al servicio DNS desde la red local y posteriormente se recarga el firewall.
-
-sudo firewall-cmd --permanent --add-service=dns
-
-sudo firewall-cmd --reload
-
-## ##
-
-
-...
-
-allow-query { localhost; };
-
-...
-
-En un entorno de red local querremos que las consultas de los clientes sean tramitadas, así que tendremos que cambiar el valor de este bloque. Podríamos añadir direcciones IP individuales, rangos de red, etc. pero en este tipo de entornos es más fácil usar el valor any:
-
-...
-
-allow-query { any; };
-
-## ##
-
-**Paso 6: Comprobación de errores**
-
-Guardamos los cambios y antes de iniciar Bind con la nueva configuración comprobamos que no haya errores en la configuración con el comando named-checkconf:
-
-sudo named-checkconf
-
-Si este comando no produce ninguna salida, la sintaxis de la configuración es correcta, y podemos arrancar el servicio Bind
 sudo systemctl start named
-
-## ##
-
-**Paso 7: Verificar el estado del servicio**
-
 sudo systemctl status named
+```
 
-## ##
+![image](https://github.com/user-attachments/assets/ac17de67-464a-4170-b740-46bc8aa0ff69)
 
-**Paso 8: probar el servicio**
+Con esto podemos comprobar que el servicio está funcionando correctamente.
 
-se usa para consultar información sobre nombres de dominio y registros DNS. En CentOS 9, el comando dig te permite realizar consultas DNS desde la línea de comandos.
+**Paso 11: Verificaciones del servicio DNS**
+Por último, se probó el servicio DNS con el comando nslookup. Primero, se realizó una consulta usando la IP del servidor para verificar si se resuelven correctamente los nombres de dominio asociados a esa IP. Luego, se realizó una consulta usando un nombre de dominio para comprobar si el servidor devuelve la IP correcta. 
 
-dig @localhost example.com
-## ##
-**Paso 9:**
+![image](https://github.com/user-attachments/assets/c697a430-2a3f-4764-b920-41e5bcb623c8)
 
-sudo nano /etc/bind/named.conf.local
-zone "example.local" {
-    type master;
-    file "/etc/bind/zones/db.example.local";
-};
+Esto confirma que el servicio DNS está funcionando adecuadamente tanto para la resolución inversa (IP a nombre) como para la resolución directa (nombre a IP).
 
-## ##
 
-**Paso 10:**
 
-sudo mkdir -p /etc/bind/zones
-sudo nano /etc/bind/zones/db.example.local
-$TTL    604800
-@       IN      SOA     ns1.example.local. admin.example.local. (
-                           1         ; Serial
-                      604800         ; Refresh
-                       86400         ; Retry
-                     2419200         ; Expire
-                      604800 )       ; Negative Cache TTL
-;
-@       IN      NS      ns1.example.local.
-@       IN      A       192.168.100.101
-ns1     IN      A       192.168.100.101
-asterisk IN      A       192.168.100.101
 
-## ##
 
-**Paso 11:**
 
-sudo named-checkconf
-sudo named-checkzone example.local /etc/bind/zones/db.example.local
 
-## ##
 
-**Paso 12:**
-
-sudo systemctl restart named
-
-## ##
-
-**Paso 13:** 
-
-dig asterisk.example.local
-
-## ##
